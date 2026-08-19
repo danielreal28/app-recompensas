@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://app-recompensas-1.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 const MIN_WITHDRAWAL_USD = 5.00;
