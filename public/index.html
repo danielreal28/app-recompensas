@@ -3,55 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recompensas App</title>
-  <link rel="stylesheet" href="style.css">
+  <title>App Recompensas</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #fff; text-align: center; margin: 0; padding: 20px; }
+    .card { background: #1e293b; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .btn { background: #f59e0b; border: none; padding: 12px 20px; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; }
+    .btn:disabled { background: #64748b; cursor: not-allowed; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #1e293b; padding: 20px; border-radius: 12px; width: 85%; max-width: 350px; text-align: center; }
+    .video-box { background: #000; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 8px; margin-bottom: 15px; font-size: 18px; color: #f59e0b; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <div class="app-container">
-    <header class="balance-card">
-      <span class="balance-title">TU SALDO DISPONIBLE</span>
-      <div class="points-display">
-        <span id="user-points">0</span> <small>pts</small>
-      </div>
-      <span id="user-usd" class="usd-badge">≈ $0.00 USDT</span>
-    </header>
 
-    <section class="card">
-      <div class="card-header">
-        <h2>🎥 Tareas Diarias</h2>
-        <span class="badge">Recompensa</span>
-      </div>
-      <p class="card-desc">Mira un video publicitario completo y recibe puntos instantáneos.</p>
-      <button id="btn-watch-ad" class="btn btn-primary" onclick="watchAd()">
-        Ver Video (+10 pts)
-      </button>
-    </section>
-
-    <section class="card">
-      <div class="card-header">
-        <h2>👥 Invita y Gana</h2>
-        <span class="badge-success">10% de por vida</span>
-      </div>
-      <p class="card-desc">Gana comisiones pasivas por cada video que vean tus amigos.</p>
-      <div class="referral-input-group">
-        <span id="ref-code" class="ref-code">DANI123</span>
-        <button class="btn btn-secondary" onclick="copyRefCode()">Copiar Link</button>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="card-header">
-        <h2>⚡ Retiro Binance Pay</h2>
-      </div>
-      <p class="card-desc">Mínimo de retiro: <strong>$5.00 USDT</strong></p>
-      <div class="form-group">
-        <input type="text" id="binance-id" placeholder="Binance Pay ID o Correo" autocomplete="off">
-        <button id="btn-withdraw" class="btn btn-accent" onclick="requestWithdrawal()">
-          Solicitar Retiro
-        </button>
-      </div>
-    </section>
+  <div class="card">
+    <h3>TU SALDO DISPONIBLE</h3>
+    <h1 id="user-points">0</h1>
+    <p id="user-usd">≈ $0.00 USDT</p>
   </div>
+
+  <div class="card">
+    <h3>🎬 Tareas Diarias</h3>
+    <p>Mira un video publicitario completo de 15s y recibe puntos instantáneos.</p>
+    <button id="btn-watch-ad" class="btn" onclick="startAdVideo()">Ver Video (+10 pts)</button>
+  </div>
+
+  <!-- Modal Reproductor de Anuncio -->
+  <div id="ad-modal" class="modal">
+    <div class="modal-content">
+      <h3>Anuncio en reproducción</h3>
+      <div class="video-box" id="video-timer">⏱️ 15s</div>
+      <p style="font-size: 12px; color: #94a3b8;">Por favor no cierres la pantalla hasta completar el tiempo.</p>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
