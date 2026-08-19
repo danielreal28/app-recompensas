@@ -14,7 +14,8 @@ app.get('/api/status', (req, res) => {
   res.json({ success: true, message: "Servidor backend funcionando correctamente" });
 });
 
-app.get('*', (req, res) => {
+// Sintaxis compatible con versiones recientes de Express/path-to-regexp
+app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
