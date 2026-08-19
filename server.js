@@ -22,9 +22,16 @@ app.get('/user/:id', (req, res) => {
   res.json({
     success: true,
     points: userData.points,
-    balance: userData.balance,
     pts: userData.points,
-    user: userData
+    puntos: userData.points,
+    balance: userData.balance,
+    usdt: userData.balance,
+    user: {
+      ...userData,
+      pts: userData.points,
+      puntos: userData.points,
+      usdt: userData.balance
+    }
   });
 });
 
@@ -37,9 +44,16 @@ app.post('/watch-ad', (req, res) => {
     success: true,
     message: "¡Anuncio completado!",
     points: userData.points,
-    balance: userData.balance,
     pts: userData.points,
-    user: userData
+    puntos: userData.points,
+    balance: userData.balance,
+    usdt: userData.balance,
+    user: {
+      ...userData,
+      pts: userData.points,
+      puntos: userData.points,
+      usdt: userData.balance
+    }
   });
 });
 
