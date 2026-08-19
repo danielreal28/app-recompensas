@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recompensas App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="balance-card">
+      <span class="balance-title">TU SALDO DISPONIBLE</span>
+      <div class="points-display">
+        <span id="user-points">0</span> <small>pts</small>
+      </div>
+      <span id="user-usd" class="usd-badge">≈ $0.00 USDT</span>
+    </header>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>🎥 Tareas Diarias</h2>
+        <span class="badge">Recompensa</span>
+      </div>
+      <p class="card-desc">Mira un video publicitario completo y recibe puntos instantáneos.</p>
+      <button id="btn-watch-ad" class="btn btn-primary" onclick="watchAd()">
+        Ver Video (+10 pts)
+      </button>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>👥 Invita y Gana</h2>
+        <span class="badge-success">10% de por vida</span>
+      </div>
+      <p class="card-desc">Gana comisiones pasivas por cada video que vean tus amigos.</p>
+      <div class="referral-input-group">
+        <span id="ref-code" class="ref-code">DANI123</span>
+        <button class="btn btn-secondary" onclick="copyRefCode()">Copiar Link</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>⚡ Retiro Binance Pay</h2>
+      </div>
+      <p class="card-desc">Mínimo de retiro: <strong>$5.00 USDT</strong></p>
+      <div class="form-group">
+        <input type="text" id="binance-id" placeholder="Binance Pay ID o Correo" autocomplete="off">
+        <button id="btn-withdraw" class="btn btn-accent" onclick="requestWithdrawal()">
+          Solicitar Retiro
+        </button>
+      </div>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

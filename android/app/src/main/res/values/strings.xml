@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">App Recompensas</string>
+    <string name="title_activity_main">App Recompensas</string>
+    <string name="package_name">com.recompensas.app</string>
+    <string name="custom_url_scheme">com.recompensas.app</string>
+</resources>
