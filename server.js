@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Estado inicial del usuario
-let userState = {
+let userData = {
   id: "DANI123",
   points: 100,
   balance: 0.10
@@ -19,28 +19,36 @@ let userState = {
 
 // Obtener datos del usuario
 app.get('/user/:id', (req, res) => {
-  res.json(userState);
+  res.json({
+    success: true,
+    points: userData.points,
+    balance: userData.balance,
+    pts: userData.points,
+    user: userData
+  });
 });
 
-// Recompensa del video
+// Recompensa al ver el video (+10 puntos)
 app.post('/watch-ad', (req, res) => {
-  userState.points += 10;
-  userState.balance = (userState.points / 1000); // Ejemplo: 1000 pts = $1 USDT
+  userData.points += 10;
+  userData.balance = (userData.points / 1000); // 1000 pts = $1.00 USDT
 
   res.json({
     success: true,
     message: "¡Anuncio completado!",
-    points: userState.points,
-    balance: userState.balance,
-    user: userState
+    points: userData.points,
+    balance: userData.balance,
+    pts: userData.points,
+    user: userData
   });
 });
 
-// Retiro
+// Solicitud de retiro
 app.post('/withdraw', (req, res) => {
   res.json({ success: true, message: "Solicitud de retiro enviada con éxito" });
 });
 
+// Enrutado genérico
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
