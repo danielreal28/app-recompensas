@@ -20,7 +20,7 @@ async function loadUserData() {
     const data = await res.json();
     if (data.success) updateUI(data.points);
   } catch (err) {
-    logDebug("Error con servidor API: " + err.message);
+    logDebug("Error API: " + err.message);
   }
 }
 
@@ -48,16 +48,11 @@ function initUnityAds() {
   const unity = getUnityPlugin();
   
   if (unity) {
-    logDebug("Plugin UnityAds encontrado. Inicializando Game ID: " + UNITY_GAME_ID);
-    
-    // Inicializar en modo Test (true) para asegurar disponibilidad inmediata de anuncios de prueba
+    logDebug("Inicializando SDK Game ID: " + UNITY_GAME_ID);
+    // Inicializar en modo prueba para forzar descarga del anuncio
     unity.unityAdsInit(UNITY_GAME_ID, true);
-
-    unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
-      logDebug("Estado UnityAdsReady: " + ready);
-    });
   } else {
-    logDebug("Plugin UnityAds NO detectado en el entorno nativo.");
+    logDebug("Plugin no detectado.");
   }
 }
 
@@ -66,35 +61,25 @@ async function startAdVideo() {
   const unity = getUnityPlugin();
 
   if (unity) {
-    showUnityAd(unity);
+    logDebug("Llamando showUnityAd directamente...");
+    
+    // Forzar la re-inicializacion en caso de perdida de contexto
+    unity.unityAdsInit(UNITY_GAME_ID, true);
+
+    unity.showUnityAd(UNITY_PLACEMENT_ID, {
+      onComplete: function() {
+        logDebug("Anuncio completado.");
+        claimReward();
+      },
+      onFail: function() {
+        logDebug("Fallo la reproduccion.");
+        alert("El anuncio no esta listo todavia. Reintenta en 3 segundos.");
+      }
+    });
   } else {
-    logDebug("Ejecutando simulador web (no nativo).");
+    logDebug("Ejecutando simulador web.");
     runWebSimulatedAd();
   }
-}
-
-function showUnityAd(unity) {
-  logDebug("Llamando unityAdsReady para " + UNITY_PLACEMENT_ID);
-
-  unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
-    logDebug("Respuesta Ready: " + ready);
-    if (ready) {
-      unity.showUnityAd(UNITY_PLACEMENT_ID, {
-        onComplete: function() {
-          logDebug("Anuncio completado con exito.");
-          claimReward();
-        },
-        onFail: function() {
-          logDebug("Fallo la reproduccion del anuncio.");
-          alert("No se pudo completar la visualización del anuncio.");
-        }
-      });
-    } else {
-      logDebug("Anuncio no listo aun. Re-inicializando Unity...");
-      unity.unityAdsInit(UNITY_GAME_ID, true);
-      alert("El anuncio se está preparando. Presiona de nuevo en 5 segundos.");
-    }
-  });
 }
 
 function runWebSimulatedAd() {
