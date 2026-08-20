@@ -2,9 +2,10 @@ const API_URL = "https://app-recompensas-3.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 
-// Credenciales de Unity Ads
 const UNITY_GAME_ID = "800359230";
 const UNITY_PLACEMENT_ID = "Rewarded_Android";
+
+let isUnityReady = false;
 
 async function loadUserData() {
   try {
@@ -27,14 +28,46 @@ function updateUI(points) {
   if (elemUsd) elemUsd.innerText = `≈ $${currentUSD} USDT`;
 }
 
-async function startAdVideo() {
-  const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform();
+function getUnityPlugin() {
+  return window.unityads || (window.cordova && window.cordova.plugins && window.cordova.plugins.unityads);
+}
 
-  if (isCapacitor && window.unityads) {
-    showUnityAd();
+function initUnityAds() {
+  const unity = getUnityPlugin();
+  if (unity) {
+    // Inicializar el SDK de Unity Ads en cuanto carga la app
+    unity.unityAdsInit(UNITY_GAME_ID, false);
+    
+    // Escuchar cuando el anuncio esté cargado y listo
+    unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
+      if (ready) {
+        isUnityReady = true;
+      }
+    });
+  }
+}
+
+async function startAdVideo() {
+  const unity = getUnityPlugin();
+
+  if (unity) {
+    showUnityAd(unity);
   } else {
+    // Si no es un entorno nativo (ej. navegador web PC), usa la simulación
     runWebSimulatedAd();
   }
+}
+
+function showUnityAd(unity) {
+  // Intentar mostrar el anuncio
+  unity.showUnityAd(UNITY_PLACEMENT_ID, {
+    onComplete: function() {
+      claimReward();
+    },
+    onFail: function() {
+      alert("No se pudo completar la visualización del anuncio.");
+    }
+  });
 }
 
 function runWebSimulatedAd() {
@@ -61,25 +94,6 @@ function runWebSimulatedAd() {
   }, 1000);
 }
 
-function showUnityAd() {
-  const unity = window.unityads;
-
-  unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
-    if (ready) {
-      unity.showUnityAd(UNITY_PLACEMENT_ID, {
-        onComplete: function() {
-          claimReward();
-        },
-        onFail: function() {
-          alert("No se pudo reproducir el video completo.");
-        }
-      });
-    } else {
-      alert("El anuncio aún se está cargando. Inténtalo de nuevo en unos segundos.");
-    }
-  });
-}
-
 async function claimReward() {
   try {
     const res = await fetch(`${API_URL}/watch-ad`, {
@@ -97,39 +111,5 @@ async function claimReward() {
   }
 }
 
-function copyRefCode() {
-  const elemCode = document.getElementById('ref-code');
-  if (!elemCode) return;
-  navigator.clipboard.writeText(`https://tuapp.com/signup?ref=${elemCode.innerText}`);
-  alert("¡Enlace copiado!");
-}
-
-async function requestWithdrawal() {
-  const inputBinance = document.getElementById('binance-id');
-  if (!inputBinance) return;
-  const binanceId = inputBinance.value.trim();
-  if (!binanceId) return alert("Ingresa tu Binance Pay ID o correo.");
-
-  try {
-    const res = await fetch(`${API_URL}/withdraw`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: USER_ID, binanceId, amountUSD: 5.00 })
-    });
-    const data = await res.json();
-    if (data.success) {
-      alert("¡Solicitud enviada con éxito!");
-    } else {
-      alert(data.message || "Error al procesar el retiro.");
-    }
-  } catch (err) {
-    alert("Error procesando el retiro.");
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadUserData();
-  if (window.Capacitor && window.Capacitor.isNativePlatform() && window.unityads) {
-    window.unityads.unityAdsInit(UNITY_GAME_ID, false);
-  }
-});
+document.addEventListener('DOMContentLoaded', loadUserData);
+document.addEventListener('deviceready', initUnityAds, false);
