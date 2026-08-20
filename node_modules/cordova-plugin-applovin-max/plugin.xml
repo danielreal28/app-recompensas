@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-applovin-max" version="2.1.0">
+    <name>AppLovin MAX</name>
+    <description>AppLovin MAX Cordova Plugin</description>
+    <license>MIT</license>
+    <keywords>applovin,max</keywords>
+    <repo>https://github.com/AppLovin/AppLovin-MAX-Cordova</repo>
+    <issue>https://github.com/AppLovin/AppLovin-MAX-Cordova/issues</issue>
+
+    <js-module src="www/applovinmax.js" name="AppLovinMAX">
+        <!-- module.exports gets inserted into the `window` object as window.applovin -->
+        <clobbers target="applovin" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="AppLovinMAX" >
+                <param name="android-package" value="com.applovin.cordova.AppLovinMAX" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/AppLovinMAX.java" target-dir="src/com/applovin/cordova" />
+        
+        <framework src="com.applovin:applovin-sdk:13.2.0" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="AppLovinMAX">
+                <param name="ios-package" value="AppLovinMAX" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/AppLovinMAX.h" />
+        <source-file src="src/ios/AppLovinMAX.m" />
+
+        <podspec>
+          <config>
+            <source url="https://github.com/CocoaPods/Specs.git"/>
+          </config>
+          <pods use-frameworks="true">
+            <pod name="AppLovinSDK" spec="13.2.0" />/>
+          </pods>
+        </podspec>
+    </platform>
+</plugin>

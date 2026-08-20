@@ -2,6 +2,10 @@ const API_URL = "https://app-recompensas-3.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 
+// Credenciales de Unity Ads
+const UNITY_GAME_ID = "800359230";
+const UNITY_PLACEMENT_ID = "Rewarded_Android";
+
 async function loadUserData() {
   try {
     const res = await fetch(`${API_URL}/user/${USER_ID}`);
@@ -23,53 +27,57 @@ function updateUI(points) {
   if (elemUsd) elemUsd.innerText = `≈ $${currentUSD} USDT`;
 }
 
-// Iniciar proceso de video (Detecta si es App Móvil o Navegador Web)
 async function startAdVideo() {
   const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform();
 
-  if (isCapacitor) {
-    // AQUÍ SE EJECUTARÁ EL ANUNCIO REAL DE ADMOB EN EL TELÉFONO
-    showRealAdMobVideo();
+  if (isCapacitor && window.unityads) {
+    showUnityAd();
   } else {
-    // Si estás en la PC, ejecuta la simulación con temporizador
     runWebSimulatedAd();
   }
 }
 
-// Simulación para navegador Web en PC
 function runWebSimulatedAd() {
   const modal = document.getElementById('ad-modal');
   const timerBox = document.getElementById('video-timer');
   const btn = document.getElementById('btn-watch-ad');
   
-  btn.disabled = true;
-  modal.style.display = 'flex';
+  if (btn) btn.disabled = true;
+  if (modal) modal.style.display = 'flex';
   let timeLeft = 15;
 
-  timerBox.innerText = `⏱️ ${timeLeft}s`;
+  if (timerBox) timerBox.innerText = `⏱️ ${timeLeft}s`;
 
   const countdown = setInterval(async () => {
     timeLeft--;
-    timerBox.innerText = `⏱️ ${timeLeft}s`;
+    if (timerBox) timerBox.innerText = `⏱️ ${timeLeft}s`;
 
     if (timeLeft <= 0) {
       clearInterval(countdown);
-      modal.style.display = 'none';
-      btn.disabled = false;
+      if (modal) modal.style.display = 'none';
+      if (btn) btn.disabled = false;
       await claimReward();
     }
   }, 1000);
 }
 
-// Función para AdMob Real en Android
-async function showRealAdMobVideo() {
-  try {
-    // Cuando configuremos AdMob, aquí se lanza el video real de Google
-    alert("Cargando anuncio real de Google AdMob...");
-    await claimReward();
-  } catch (err) {
-    alert("Error al cargar la publicidad real.");
-  }
+function showUnityAd() {
+  const unity = window.unityads;
+
+  unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
+    if (ready) {
+      unity.showUnityAd(UNITY_PLACEMENT_ID, {
+        onComplete: function() {
+          claimReward();
+        },
+        onFail: function() {
+          alert("No se pudo reproducir el video completo.");
+        }
+      });
+    } else {
+      alert("El anuncio aún se está cargando. Inténtalo de nuevo en unos segundos.");
+    }
+  });
 }
 
 async function claimReward() {
@@ -85,7 +93,7 @@ async function claimReward() {
       alert("¡Anuncio completado! +10 puntos acreditados.");
     }
   } catch (err) {
-    alert("Error al conectar con el servidor para acreditar la recompensa.");
+    alert("Error al conectar con el servidor.");
   }
 }
 
@@ -110,7 +118,7 @@ async function requestWithdrawal() {
     });
     const data = await res.json();
     if (data.success) {
-      alert("Solicitud enviada con éxito!");
+      alert("¡Solicitud enviada con éxito!");
     } else {
       alert(data.message || "Error al procesar el retiro.");
     }
@@ -119,4 +127,9 @@ async function requestWithdrawal() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadUserData);
+document.addEventListener('DOMContentLoaded', () => {
+  loadUserData();
+  if (window.Capacitor && window.Capacitor.isNativePlatform() && window.unityads) {
+    window.unityads.unityAdsInit(UNITY_GAME_ID, false);
+  }
+});
