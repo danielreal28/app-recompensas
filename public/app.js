@@ -5,7 +5,14 @@ const USD_PER_POINT = 0.0005;
 const UNITY_GAME_ID = "800359230";
 const UNITY_PLACEMENT_ID = "Rewarded_Android";
 
-let isUnityReady = false;
+function logDebug(msg) {
+  console.log(msg);
+  const logDiv = document.getElementById('debug-log');
+  if (logDiv) {
+    logDiv.innerHTML += "<br>> " + msg;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+}
 
 async function loadUserData() {
   try {
@@ -13,7 +20,7 @@ async function loadUserData() {
     const data = await res.json();
     if (data.success) updateUI(data.points);
   } catch (err) {
-    console.error("Error conectando con el servidor:", err);
+    logDebug("Error con servidor API: " + err.message);
   }
 }
 
@@ -29,43 +36,63 @@ function updateUI(points) {
 }
 
 function getUnityPlugin() {
-  return window.unityads || (window.cordova && window.cordova.plugins && window.cordova.plugins.unityads);
+  if (window.unityads) return window.unityads;
+  if (window.cordova && window.cordova.plugins && window.cordova.plugins.unityads) {
+    return window.cordova.plugins.unityads;
+  }
+  return null;
 }
 
 function initUnityAds() {
+  logDebug("Evento deviceready detectado.");
   const unity = getUnityPlugin();
+  
   if (unity) {
-    // Inicializar el SDK de Unity Ads en cuanto carga la app
-    unity.unityAdsInit(UNITY_GAME_ID, false);
+    logDebug("Plugin UnityAds encontrado. Inicializando Game ID: " + UNITY_GAME_ID);
     
-    // Escuchar cuando el anuncio esté cargado y listo
+    // Inicializar en modo Test (true) para asegurar disponibilidad inmediata de anuncios de prueba
+    unity.unityAdsInit(UNITY_GAME_ID, true);
+
     unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
-      if (ready) {
-        isUnityReady = true;
-      }
+      logDebug("Estado UnityAdsReady: " + ready);
     });
+  } else {
+    logDebug("Plugin UnityAds NO detectado en el entorno nativo.");
   }
 }
 
 async function startAdVideo() {
+  logDebug("Boton Ver Video presionado.");
   const unity = getUnityPlugin();
 
   if (unity) {
     showUnityAd(unity);
   } else {
-    // Si no es un entorno nativo (ej. navegador web PC), usa la simulación
+    logDebug("Ejecutando simulador web (no nativo).");
     runWebSimulatedAd();
   }
 }
 
 function showUnityAd(unity) {
-  // Intentar mostrar el anuncio
-  unity.showUnityAd(UNITY_PLACEMENT_ID, {
-    onComplete: function() {
-      claimReward();
-    },
-    onFail: function() {
-      alert("No se pudo completar la visualización del anuncio.");
+  logDebug("Llamando unityAdsReady para " + UNITY_PLACEMENT_ID);
+
+  unity.unityAdsReady(UNITY_PLACEMENT_ID, function(ready) {
+    logDebug("Respuesta Ready: " + ready);
+    if (ready) {
+      unity.showUnityAd(UNITY_PLACEMENT_ID, {
+        onComplete: function() {
+          logDebug("Anuncio completado con exito.");
+          claimReward();
+        },
+        onFail: function() {
+          logDebug("Fallo la reproduccion del anuncio.");
+          alert("No se pudo completar la visualización del anuncio.");
+        }
+      });
+    } else {
+      logDebug("Anuncio no listo aun. Re-inicializando Unity...");
+      unity.unityAdsInit(UNITY_GAME_ID, true);
+      alert("El anuncio se está preparando. Presiona de nuevo en 5 segundos.");
     }
   });
 }
