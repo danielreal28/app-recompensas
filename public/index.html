@@ -24,6 +24,7 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
       text-align: center;
       margin-bottom: 20px;
+      box-sizing: border-box;
     }
     .points {
       font-size: 36px;
@@ -46,6 +47,7 @@
       cursor: pointer;
       width: 100%;
       margin-bottom: 10px;
+      font-weight: bold;
     }
     button:disabled {
       background-color: #555555;
@@ -55,16 +57,28 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
+      width: 100vw;
+      height: 100vh;
+      background: #0d0d0d;
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      z-index: 9999;
+      text-align: center;
+    }
+    .modal h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #ffffff;
     }
     .timer {
-      font-size: 24px;
+      font-size: 32px;
+      font-weight: bold;
       color: #ffeb3b;
+      background: #1e1e1e;
+      padding: 15px 30px;
+      border-radius: 12px;
+      border: 2px solid #333;
     }
     #debug-log {
       background-color: #000;
@@ -75,10 +89,11 @@
       border-radius: 6px;
       width: 100%;
       max-width: 400px;
-      height: 120px;
+      height: 100px;
       overflow-y: auto;
       text-align: left;
       border: 1px solid #333;
+      box-sizing: border-box;
     }
   </style>
 </head>
@@ -93,17 +108,17 @@
 
   <div class="card">
     <h3>Retirar Ganancias</h3>
-    <input type="text" id="binance-id" placeholder="ID o correo Binance Pay" style="width:90%; padding:8px; margin-bottom:10px; border-radius:4px; border:1px solid #444; background:#222; color:#fff;">
+    <input type="text" id="binance-id" placeholder="ID o correo Binance Pay" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; box-sizing:border-box;">
     <button onclick="requestWithdrawal()">Solicitar Retiro ($5.00)</button>
   </div>
 
   <div style="width: 100%; max-width: 400px;">
-    <p style="font-size:12px; color:#888; margin-bottom:4px;">Registro de Diagnóstico (Debug):</p>
-    <div id="debug-log">Esperando inicialización...</div>
+    <p style="font-size:12px; color:#888; margin-bottom:4px;">Registro de Estado:</p>
+    <div id="debug-log">Aplicación cargada correctamente.</div>
   </div>
 
   <div class="modal" id="ad-modal">
-    <h3>Viendo Anuncio...</h3>
+    <h3>🎬 Reproduciendo Anuncio...</h3>
     <div class="timer" id="video-timer">⏱️ 15s</div>
   </div>
 
