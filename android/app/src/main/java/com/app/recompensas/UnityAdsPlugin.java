@@ -16,11 +16,9 @@ public class UnityAdsPlugin extends Plugin {
         String placementId = call.getString("placementId", "Rewarded_Android");
 
         getActivity().runOnUiThread(() -> {
-            // 1. Cargar el anuncio en memoria
             UnityAds.load(placementId, new IUnityAdsLoadListener() {
                 @Override
                 public void onUnityAdsAdLoaded(String placementId) {
-                    // 2. Una vez cargado, reproducirlo
                     UnityAds.show(getActivity(), placementId, new IUnityAdsShowListener() {
                         @Override
                         public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
@@ -29,7 +27,7 @@ public class UnityAdsPlugin extends Plugin {
 
                         @Override
                         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
-                            call.reject("Error al mostrar: " + message);
+                            call.reject("Error Unity Show: " + message);
                         }
 
                         @Override
@@ -42,7 +40,7 @@ public class UnityAdsPlugin extends Plugin {
 
                 @Override
                 public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
-                    call.reject("Error al cargar anuncio: " + message);
+                    call.reject("Error Unity Load: " + message);
                 }
             });
         });
