@@ -1,5 +1,6 @@
 package com.app.recompensas;
 
+import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -22,25 +23,31 @@ public class UnityAdsPlugin extends Plugin {
                     UnityAds.show(getActivity(), placementId, new IUnityAdsShowListener() {
                         @Override
                         public void onUnityAdsShowComplete(String placementId, UnityAds.UnityAdsShowCompletionState state) {
-                            call.resolve();
+                            JSObject ret = new JSObject();
+                            ret.put("completed", state == UnityAds.UnityAdsShowCompletionState.COMPLETED);
+                            call.resolve(ret);
                         }
 
                         @Override
                         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
-                            call.reject("Error Unity Show: " + message);
+                            call.reject("Error al mostrar el anuncio: " + message);
                         }
 
                         @Override
-                        public void onUnityAdsShowStart(String placementId) {}
+                        public void onUnityAdsShowStart(String placementId) {
+                            // Anuncio iniciado
+                        }
 
                         @Override
-                        public void onUnityAdsShowClick(String placementId) {}
+                        public void onUnityAdsShowClick(String placementId) {
+                            // Clic en el anuncio
+                        }
                     });
                 }
 
                 @Override
                 public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
-                    call.reject("Error Unity Load: " + message);
+                    call.reject("Error al cargar el anuncio: " + message);
                 }
             });
         });

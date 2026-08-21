@@ -7,22 +7,24 @@ import com.unity3d.ads.IUnityAdsInitializationListener;
 
 public class MainActivity extends BridgeActivity {
 
-    private final String GAME_ID = "800359230";
-    private final boolean TEST_MODE = false;
+    private static final String GAME_ID = "800359230";
+    private static final boolean TEST_MODE = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // Registrar el plugin en el motor de Capacitor ANTES de super.onCreate
         registerPlugin(UnityAdsPlugin.class);
         super.onCreate(savedInstanceState);
 
-        // Inicializar SDK de Unity Ads
         UnityAds.initialize(getApplicationContext(), GAME_ID, TEST_MODE, new IUnityAdsInitializationListener() {
             @Override
-            public void onInitializationComplete() {}
+            public void onInitializationComplete() {
+                // Inicialización completada
+            }
 
             @Override
-            public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {}
+            public void onInitializationFailed(UnityAds.UnityAdsInitializationError error, String message) {
+                // Fallo de inicialización
+            }
         });
     }
 }

@@ -2,12 +2,18 @@ const API_URL = "https://app-recompensas-3.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 
+// Registrar el plugin directamente desde el objeto global de Capacitor
+const UnityAdsNative = (window.Capacitor && window.Capacitor.registerPlugin) 
+  ? window.Capacitor.registerPlugin('UnityAdsNative') 
+  : null;
+
 function logDebug(msg) {
   const box = document.getElementById('debug-log');
   if (box) {
     box.innerHTML += `<br>> ${msg}`;
     box.scrollTop = box.scrollHeight;
   }
+  console.log(msg);
 }
 
 async function loadUserData() {
@@ -33,21 +39,24 @@ function updateUI(points) {
 
 async function startAdVideo() {
   logDebug("Solicitando video nativo de Unity Ads...");
-  
-  const UnityNative = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAdsNative;
 
-  if (UnityNative) {
-    try {
-      await UnityNative.showRewardVideo({ placementId: "Rewarded_Android" });
-      logDebug("Anuncio completado con éxito.");
-      await claimReward();
-    } catch (e) {
-      logDebug(`Aviso Unity: ${e.message || e}`);
-      logDebug("Ejecutando respaldo visual...");
+  try {
+    if (window.Capacitor && window.Capacitor.isNativePlatform() && UnityAdsNative) {
+      const result = await UnityAdsNative.showRewardVideo({ placementId: "Rewarded_Android" });
+      
+      if (result && result.completed) {
+        logDebug("¡Anuncio visto completamente!");
+        await claimReward();
+      } else {
+        logDebug("El anuncio fue cerrado antes de finalizar.");
+      }
+    } else {
+      logDebug("Entorno no nativo o plugin no registrado, ejecutando respaldo.");
       runWebSimulatedAd();
     }
-  } else {
-    logDebug("Plugin nativo no hallado, ejecutando respaldo.");
+  } catch (err) {
+    logDebug(`Aviso Unity: ${err.message || err}`);
+    logDebug("Ejecutando respaldo simulado...");
     runWebSimulatedAd();
   }
 }
@@ -93,4 +102,7 @@ async function claimReward() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadUserData);
+document.addEventListener('DOMContentLoaded', () => {
+  logDebug("Aplicación cargada correctamente.");
+  loadUserData();
+});
