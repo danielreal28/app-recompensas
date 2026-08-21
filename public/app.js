@@ -2,16 +2,26 @@ const API_URL = "https://app-recompensas-3.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 
-const UNITY_GAME_ID = "800359230";
-const UNITY_PLACEMENT_ID = "Rewarded_Android";
+function logDebug(msg) {
+  const box = document.getElementById('debug-log');
+  if (box) {
+    box.innerHTML += `<br>> ${msg}`;
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+window.onerror = function(msg, url, line) {
+  logDebug(`ERROR: ${msg} (línea ${line})`);
+};
 
 async function loadUserData() {
   try {
+    logDebug("Cargando datos de usuario...");
     const res = await fetch(`${API_URL}/user/${USER_ID}`);
     const data = await res.json();
     if (data.success) updateUI(data.points);
   } catch (err) {
-    console.error("Error conectando con el servidor:", err);
+    logDebug(`Error servidor: ${err.message}`);
   }
 }
 
@@ -27,20 +37,16 @@ function updateUI(points) {
 }
 
 async function startAdVideo() {
-  const UnityAds = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAds;
-
-  if (UnityAds) {
-    try {
-      await UnityAds.initialize({ gameId: UNITY_GAME_ID, testMode: false });
-      await UnityAds.showRewardVideo({ placementId: UNITY_PLACEMENT_ID });
-      await claimReward();
-    } catch (e) {
-      alert("Anuncio no disponible temporalmente. Ejecutando simulación.");
-      runWebSimulatedAd();
-    }
+  logDebug("Iniciando solicitud de video...");
+  
+  // Detectar si existen plugins cargados
+  if (window.Capacitor && window.Capacitor.Plugins) {
+    logDebug(`Plugins disponibles: ${Object.keys(window.Capacitor.Plugins).join(', ')}`);
   } else {
-    runWebSimulatedAd();
+    logDebug("Capacitor Plugins no detectados en WebView.");
   }
+
+  runWebSimulatedAd();
 }
 
 function runWebSimulatedAd() {
@@ -69,6 +75,7 @@ function runWebSimulatedAd() {
 
 async function claimReward() {
   try {
+    logDebug("Enviando reclamo de recompensa...");
     const res = await fetch(`${API_URL}/watch-ad`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -77,11 +84,14 @@ async function claimReward() {
     const data = await res.json();
     if (data.success) {
       updateUI(data.points);
-      alert("¡Anuncio completado! +10 puntos acreditados.");
+      logDebug("Recompensa acreditada +10 pts");
     }
   } catch (err) {
-    alert("Error al conectar con el servidor.");
+    logDebug(`Error al reclamar: ${err.message}`);
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadUserData);
+document.addEventListener('DOMContentLoaded', () => {
+  logDebug("App iniciada.");
+  loadUserData();
+});
