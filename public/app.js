@@ -2,6 +2,9 @@ const API_URL = "https://app-recompensas-3.onrender.com";
 const USER_ID = "DANI123";
 const USD_PER_POINT = 0.0005;
 
+const UNITY_GAME_ID = "800359230";
+const UNITY_PLACEMENT_ID = "Rewarded_Android";
+
 async function loadUserData() {
   try {
     const res = await fetch(`${API_URL}/user/${USER_ID}`);
@@ -24,7 +27,20 @@ function updateUI(points) {
 }
 
 async function startAdVideo() {
-  runWebSimulatedAd();
+  const UnityAds = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAds;
+
+  if (UnityAds) {
+    try {
+      await UnityAds.initialize({ gameId: UNITY_GAME_ID, testMode: false });
+      await UnityAds.showRewardVideo({ placementId: UNITY_PLACEMENT_ID });
+      await claimReward();
+    } catch (e) {
+      alert("Anuncio no disponible temporalmente. Ejecutando simulación.");
+      runWebSimulatedAd();
+    }
+  } else {
+    runWebSimulatedAd();
+  }
 }
 
 function runWebSimulatedAd() {
