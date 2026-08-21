@@ -14,7 +14,7 @@
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/core": "^8.5.0",
-    "capacitor-unity-ads": "^1.0.0",
+    "capacitor-unity-ads": "file:capacitor-unity-ads",
     "cordova-plugin-applovin-max": "^2.1.0",
     "cors": "^2.8.6",
     "express": "^5.2.1"

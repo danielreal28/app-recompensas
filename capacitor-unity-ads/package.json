@@ -1,0 +1,11 @@
+{
+  "name": "capacitor-unity-ads",
+  "version": "1.0.0",
+  "description": "Plugin local de Unity Ads para Capacitor",
+  "main": "src/index.js",
+  "capacitor": {
+    "android": {
+      "src": "android"
+    }
+  }
+}
