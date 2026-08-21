@@ -1,4 +1,4 @@
-package com.app.recompensas;
+package com.recompensas.app;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -30,24 +30,20 @@ public class UnityAdsPlugin extends Plugin {
 
                         @Override
                         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
-                            call.reject("Error al mostrar el anuncio: " + message);
+                            call.reject("Error al mostrar anuncio Unity: " + message);
                         }
 
                         @Override
-                        public void onUnityAdsShowStart(String placementId) {
-                            // Anuncio iniciado
-                        }
+                        public void onUnityAdsShowStart(String placementId) {}
 
                         @Override
-                        public void onUnityAdsShowClick(String placementId) {
-                            // Clic en el anuncio
-                        }
+                        public void onUnityAdsShowClick(String placementId) {}
                     });
                 }
 
                 @Override
                 public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
-                    call.reject("Error al cargar el anuncio: " + message);
+                    call.reject("Error al cargar anuncio Unity: " + message);
                 }
             });
         });
