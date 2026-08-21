@@ -30,7 +30,7 @@ public class UnityAdsPlugin extends Plugin {
 
                         @Override
                         public void onUnityAdsShowFailure(String placementId, UnityAds.UnityAdsShowError error, String message) {
-                            call.reject("Error al mostrar anuncio Unity: " + message);
+                            call.reject("Error al mostrar: " + message);
                         }
 
                         @Override
@@ -43,7 +43,7 @@ public class UnityAdsPlugin extends Plugin {
 
                 @Override
                 public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
-                    call.reject("Error al cargar anuncio Unity: " + message);
+                    call.reject("Error al cargar: " + message);
                 }
             });
         });
