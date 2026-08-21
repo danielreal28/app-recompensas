@@ -11,17 +11,6 @@ function logDebug(msg) {
   console.log(msg);
 }
 
-// Crear la referencia al plugin nativo mediante el puente global de Capacitor
-function getUnityAdsPlugin() {
-  if (window.Capacitor && typeof window.Capacitor.registerPlugin === 'function') {
-    return window.Capacitor.registerPlugin('UnityAdsNative');
-  }
-  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAdsNative) {
-    return window.Capacitor.Plugins.UnityAdsNative;
-  }
-  return null;
-}
-
 async function loadUserData() {
   try {
     const res = await fetch(`${API_URL}/user/${USER_ID}`);
@@ -46,7 +35,8 @@ function updateUI(points) {
 async function startAdVideo() {
   logDebug("Solicitando video nativo de Unity Ads...");
 
-  const UnityNative = getUnityAdsPlugin();
+  // Buscar el plugin directamente en el objeto de Capacitor
+  const UnityNative = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAdsNative;
 
   if (UnityNative) {
     try {
@@ -60,11 +50,26 @@ async function startAdVideo() {
         logDebug("El anuncio finalizó sin completarse.");
       }
     } catch (e) {
-      logDebug(`Error devuelto por Unity: ${e.message || e}`);
+      logDebug(`Aviso Unity: ${e.message || JSON.stringify(e)}`);
       logDebug("Ejecutando respaldo temporizado...");
       runWebSimulatedAd();
     }
   } else {
+    // Si la referencia directa no está, intentar llamar mediante Capacitor.toNative / window.CapacitorCustom
+    if (window.Capacitor && typeof window.Capacitor.nativeCallback === 'function') {
+      logDebug("Invocando plugin mediante Capacitor Bridge...");
+      try {
+        const result = await window.Capacitor.nativePromise('UnityAdsNative', 'showRewardVideo', { placementId: "Rewarded_Android" });
+        if (result && result.completed) {
+          logDebug("Anuncio completado con éxito.");
+          await claimReward();
+          return;
+        }
+      } catch (errBridge) {
+        logDebug(`Error Bridge: ${errBridge.message || errBridge}`);
+      }
+    }
+    
     logDebug("No se pudo obtener el puente nativo, ejecutando respaldo.");
     runWebSimulatedAd();
   }

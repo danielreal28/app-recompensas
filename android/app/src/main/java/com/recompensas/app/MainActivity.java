@@ -12,9 +12,11 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Registrar el plugin nativo explícitamente en el Bridge de Capacitor
         registerPlugin(UnityAdsPlugin.class);
         super.onCreate(savedInstanceState);
 
+        // Inicializar SDK de Unity Ads
         UnityAds.initialize(getApplicationContext(), GAME_ID, TEST_MODE, new IUnityAdsInitializationListener() {
             @Override
             public void onInitializationComplete() {
