@@ -1,0 +1,1 @@
+// Definiciones del plugin
