@@ -10,13 +10,8 @@ function logDebug(msg) {
   }
 }
 
-window.onerror = function(msg, url, line) {
-  logDebug(`ERROR: ${msg} (línea ${line})`);
-};
-
 async function loadUserData() {
   try {
-    logDebug("Cargando datos de usuario...");
     const res = await fetch(`${API_URL}/user/${USER_ID}`);
     const data = await res.json();
     if (data.success) updateUI(data.points);
@@ -37,16 +32,24 @@ function updateUI(points) {
 }
 
 async function startAdVideo() {
-  logDebug("Iniciando solicitud de video...");
+  logDebug("Solicitando video nativo de Unity Ads...");
   
-  // Detectar si existen plugins cargados
-  if (window.Capacitor && window.Capacitor.Plugins) {
-    logDebug(`Plugins disponibles: ${Object.keys(window.Capacitor.Plugins).join(', ')}`);
-  } else {
-    logDebug("Capacitor Plugins no detectados en WebView.");
-  }
+  const UnityNative = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UnityAdsNative;
 
-  runWebSimulatedAd();
+  if (UnityNative) {
+    try {
+      await UnityNative.showRewardVideo({ placementId: "Rewarded_Android" });
+      logDebug("Anuncio completado con éxito.");
+      await claimReward();
+    } catch (e) {
+      logDebug(`Aviso Unity: ${e.message || e}`);
+      logDebug("Ejecutando respaldo visual...");
+      runWebSimulatedAd();
+    }
+  } else {
+    logDebug("Plugin nativo no hallado, ejecutando respaldo.");
+    runWebSimulatedAd();
+  }
 }
 
 function runWebSimulatedAd() {
@@ -75,7 +78,6 @@ function runWebSimulatedAd() {
 
 async function claimReward() {
   try {
-    logDebug("Enviando reclamo de recompensa...");
     const res = await fetch(`${API_URL}/watch-ad`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -84,14 +86,11 @@ async function claimReward() {
     const data = await res.json();
     if (data.success) {
       updateUI(data.points);
-      logDebug("Recompensa acreditada +10 pts");
+      logDebug("¡Puntos acreditados correctamente!");
     }
   } catch (err) {
     logDebug(`Error al reclamar: ${err.message}`);
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  logDebug("App iniciada.");
-  loadUserData();
-});
+document.addEventListener('DOMContentLoaded', loadUserData);
