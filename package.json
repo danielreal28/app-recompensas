@@ -1,22 +1,27 @@
 {
-  "name": "app-recompensas",
+  "name": "rocket-rush",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielreal28/rocket-rush.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/danielreal28/rocket-rush/issues"
+  },
+  "homepage": "https://github.com/danielreal28/rocket-rush#readme",
   "dependencies": {
-    "@capacitor/android": "^8.5.0",
-    "@capacitor/cli": "^8.5.0",
-    "@capacitor/core": "^8.5.0",
-    "capacitor-unity-ads": "file:capacitor-unity-ads",
-    "cordova-plugin-applovin-max": "^2.1.0",
-    "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "@capacitor-community/admob": "^8.1.0",
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0"
   }
 }
